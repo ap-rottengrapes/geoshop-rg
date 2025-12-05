@@ -1,9 +1,34 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export default function LoginForm({ onSwitchToSignup, onLoginSuccess }) {
-
-    const [email,setEmail]=useState('');
+export default function LoginForm() {
+    const navigate = useNavigate()
+    
+    const [username,setUsername]=useState('');
     const [password,setPassword]=useState('');
+    const handleLogin = async () => {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/login/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+        if (response.ok) {
+            try {
+                const data = await response.json()
+                localStorage.setItem('token', data.token )
+                navigate('/dashboard')
+            } catch (error) {
+                navigate('/dashboard')
+            }
+        } else {
+            alert('Login failed')
+        }
+    };
   return (
     <div className='h-screen bg-gray-100'>
         <nav className='bg-green-900 p-4'>
@@ -14,10 +39,10 @@ export default function LoginForm({ onSwitchToSignup, onLoginSuccess }) {
                 <h3 className='text-lg font-bold mb-4'>Login</h3>
                 <input 
                     className='w-full p-2 border rounded mb-3'
-                    type='email'
-                    placeholder='abc@gmail.com'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type='text'
+                    placeholder='Username'
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 <input 
                     className='w-full p-2 border rounded mb-4'
@@ -26,8 +51,8 @@ export default function LoginForm({ onSwitchToSignup, onLoginSuccess }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button onClick={onLoginSuccess} className='w-full bg-green-900 text-white p-2 rounded'>Login</button>
-                <p className='text-center mt-4 text-sm'>Not yet Register? <button onClick={onSwitchToSignup} className='text-blue-500'>Signup</button></p>
+                <button onClick={handleLogin} className='w-full bg-green-900 text-white p-2 rounded'>Login</button>
+                <p className='text-center mt-4 text-sm'>Not yet Register? <button onClick={() => navigate('/signup')} className='text-blue-500'>Signup</button></p>
             </div>
         </div>
     </div>

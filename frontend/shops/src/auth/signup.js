@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 
-export default function SignupForm({ onSwitchToLogin }) {
-
+export default function SignupForm() {
+    const navigate = useNavigate();
     const [firstname,setFirstName]=useState('');
     const [lastname,setLastName]=useState('');
     const [username,setUsername]=useState('');
@@ -9,6 +10,35 @@ export default function SignupForm({ onSwitchToLogin }) {
     const [password,setPassword]=useState('');
     const [confirmPassword,setConfirmPassword]=useState('');
     const [errors,setErrors]=useState({});
+
+    const handleRegister = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BASE_URL}/signup/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    first_name: firstname,
+                    last_name: lastname,
+                    password,
+                    password2: confirmPassword
+                })
+            })
+            const data = await response.json() 
+            if (response.ok) {
+                alert('Registration successful!')
+                navigate('/login')
+            } else {
+                alert(data.message || 'Registration failed')
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message)
+        }
+    }
+
     useEffect(() => {
         if (confirmPassword && password) {
             if (password !== confirmPassword) {
@@ -78,8 +108,8 @@ export default function SignupForm({ onSwitchToLogin }) {
                 />
             </div>
             {errors.confirmPassword && <p className='text-red-500 text-sm mb-3'>{errors.confirmPassword}</p>}
-            <button className='w-full bg-green-900 text-white p-2 rounded mb-4'>Register</button>
-            <p className='text-center text-sm'>Already have an account? <button onClick={onSwitchToLogin} className='text-blue-500'>Login</button></p>
+            <button onClick={handleRegister} className='w-full bg-green-900 text-white p-2 rounded mb-4'>Register</button>
+            <p className='text-center text-sm'>Already have an account? <button onClick={()=>navigate('/login')} className='text-blue-500'>Login</button></p>
             </div>
         </div>    
     </div>
