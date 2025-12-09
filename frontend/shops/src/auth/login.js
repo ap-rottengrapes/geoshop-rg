@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 export default function LoginForm() {
     const navigate = useNavigate()
@@ -17,16 +18,19 @@ export default function LoginForm() {
                 password: password
             })
         });
+        console.log("Response invalid -> ",response);
         if (response.ok) {
             try {
                 const data = await response.json()
-                localStorage.setItem('token', data.token )
+                console.log(data)
+                localStorage.setItem('token', data.access )
                 navigate('/dashboard')
+                toast.success("Successfully Login");
             } catch (error) {
                 navigate('/dashboard')
             }
         } else {
-            alert('Login failed')
+            toast.error("Login failed");
         }
     };
   return (
