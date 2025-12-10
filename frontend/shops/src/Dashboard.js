@@ -107,7 +107,6 @@ export default function Dashboard() {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            
             if (response.ok) {
                 toast.success("Successfully Deleted");
                 fetchShops()
@@ -122,9 +121,9 @@ export default function Dashboard() {
 
     const handleEditShop = (shop) => {
         setEditingShop(shop)
+        setSelectedLocation(null)
         setShowEditPopup(true)
     }
-
     const handleUpdateShop = async () => {
         const token = localStorage.getItem('token')
         try {
@@ -140,8 +139,8 @@ export default function Dashboard() {
                     name: editingShop.name,
                     address: editingShop.address,
                     category: editingShop.category,
-                    latitude: editingShop.lat,
-                    longitude: editingShop.lon
+                    latitude: selectedLocation.lat,
+                    longitude: selectedLocation.lng
                 })
             })
             
@@ -149,6 +148,7 @@ export default function Dashboard() {
                 toast.success("Shop updated successfully!");
                 setShowEditPopup(false)
                 setEditingShop(null)
+                setSelectedLocation(null)
                 fetchShops()
             } else {
                 const data = await response.json()
@@ -278,8 +278,8 @@ export default function Dashboard() {
                  )}
             </div>
             {showEditPopup && editingShop && (
-                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-                    <div className='bg-white p-6 rounded-lg w-96 max-w-md'>
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto '>
+                    <div className='bg-white p-6 rounded-lg w-xl max-w-2xl max-h-screen overflow-y-auto my-auto'>
                         <h3 className='text-xl font-bold mb-4'>Edit Shop</h3>
                         <input
                             type='text'
@@ -301,6 +301,14 @@ export default function Dashboard() {
                             onChange={(e) => setEditingShop({...editingShop, address: e.target.value})}
                             className='w-full p-2 border rounded mb-4 h-20'
                         />
+                        <div className='max-w-full mb-4'>
+                            <h3 className='text-lg font-bold mb-2'>Update Location on Map</h3>
+                            <Map 
+                                onLocationSelect={setSelectedLocation}
+                                selectedPosition={selectedLocation}
+                                showCoordinates={true}
+                            />
+                        </div>
                         <div className='flex gap-3'>
                             <button
                                 onClick={handleUpdateShop}
